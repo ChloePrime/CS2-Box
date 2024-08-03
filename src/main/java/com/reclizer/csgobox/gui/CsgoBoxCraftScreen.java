@@ -1,6 +1,9 @@
 package com.reclizer.csgobox.gui;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.serialization.JsonOps;
 import com.reclizer.csgobox.config.CsgoBoxManage;
 import com.reclizer.csgobox.utils.ItemNBT;
 import net.minecraft.client.gui.GuiGraphics;
@@ -90,57 +93,47 @@ public class CsgoBoxCraftScreen extends AbstractContainerScreen<CsgoBoxCraftMenu
     }
 
     Button buttonDown;
-    public List<String> itemListExport(Entity entity){
-        List<String> itemName=new ArrayList<>();
+
+    public List<String> itemListExport(Entity entity) {
+        List<String> itemName = new ArrayList<>();
         if (entity == null)
             return null;
-        if(entity instanceof Player _player && _player.containerMenu instanceof Supplier _current && _current.get() instanceof Map _slots){
-            ItemStack stack=ItemStack.EMPTY;
-            for(int i=0;i<35;i++){
-                stack=((Slot) _slots.get(i)).getItem();
-
-
-
-                String itemid= ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
-
-                if(stack.getTag()!=null){
-                    //System.out.println(stack.getTag().getType().)
-                    //System.out.println(stack.getTag().getType().getName());
-                    itemid=itemid+".withTags"+ ItemNBT.readTags(stack);
+        if (entity instanceof Player _player && _player.containerMenu instanceof Supplier _current && _current.get() instanceof Map _slots) {
+            for (int i = 0; i < 35; i++) {
+                var stack = ((Slot) _slots.get(i)).getItem();
+                if (stack.isEmpty()) {
+                    continue;
                 }
-
-
-                if(!itemid.equals("minecraft:air")){
-                itemName.add(itemid);
-                }
+                ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, stack).result()
+                        .ifPresent(serialized -> itemName.add(serialized.toString()));
             }
-
         }
         return itemName;
     }
-    public List<Integer> gradeListExport(Entity entity){
-        List<Integer> itemGrade=new ArrayList<>();
+
+    public List<Integer> gradeListExport(Entity entity) {
+        List<Integer> itemGrade = new ArrayList<>();
         if (entity == null)
             return null;
-        if(entity instanceof Player _player && _player.containerMenu instanceof Supplier _current && _current.get() instanceof Map _slots){
-            ItemStack stack=ItemStack.EMPTY;
-            int grade=1;
-            for(int i=0;i<35;i++){
-                stack=((Slot) _slots.get(i)).getItem();
-                String itemid= ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
-                if(i>6){
-                    grade=2;
+        if (entity instanceof Player _player && _player.containerMenu instanceof Supplier _current && _current.get() instanceof Map _slots) {
+            ItemStack stack = ItemStack.EMPTY;
+            int grade = 1;
+            for (int i = 0; i < 35; i++) {
+                stack = ((Slot) _slots.get(i)).getItem();
+                String itemid = ForgeRegistries.ITEMS.getKey(stack.getItem()).toString();
+                if (i > 6) {
+                    grade = 2;
                 }
-                if(i>11){
-                    grade=3;
+                if (i > 11) {
+                    grade = 3;
                 }
-                if(i>14){
-                    grade=4;
+                if (i > 14) {
+                    grade = 4;
                 }
-                if(i>16){
-                    grade=5;
+                if (i > 16) {
+                    grade = 5;
                 }
-                if(!itemid.equals("minecraft:air")){
+                if (!itemid.equals("minecraft:air")) {
                     itemGrade.add(grade);
                 }
             }
@@ -178,10 +171,10 @@ public class CsgoBoxCraftScreen extends AbstractContainerScreen<CsgoBoxCraftMenu
 
 
         buttonDown = Button.builder(Component.translatable("gui.csgobox.csgo_box_craft.button_down"), e -> {
-            if(boxName !=null){
+            if (boxName != null) {
                 itemListExport(this.entity);
                 try {
-                    CsgoBoxManage.updateBoxJson(this.boxName.getValue(),itemListExport(this.entity),gradeListExport(this.entity));
+                    CsgoBoxManage.updateBoxJson(this.boxName.getValue(), itemListExport(this.entity), gradeListExport(this.entity));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }

@@ -1,10 +1,10 @@
 package com.reclizer.csgobox.capability.csbox;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.INBTSerializable;
 
 public interface ICsboxCap extends INBTSerializable<CompoundTag> {
-
 
     long playerSeed();
 
@@ -14,9 +14,9 @@ public interface ICsboxCap extends INBTSerializable<CompoundTag> {
 
     int setMode(final int mode);
 
-    String setItem(final  String item);
+    ItemStack setItem(final ItemStack item);
 
-    String getItem();
+    ItemStack getItem();
 
     int getGrade();
 

@@ -150,19 +150,18 @@ public class CsLookItemScreen extends Screen {
     }
     public void containerTick() {
         //super.containerTick();
-        if(!openSwitch){
+        if (!openSwitch) {
             return;
         }
         entity.playSound(ModSounds.CS_FINSH.get(), 10F, 1F);
-        ICsboxCap iCsboxCap= ModCapability.getSeed(this.entity).orElse(null);
-        if(iCsboxCap==null){return;}
-
-        ItemStack itemStack= ItemNBT.getStacks(iCsboxCap.getItem());
-        if(!itemStack.isEmpty()){
-            openItem=itemStack;
-            grade=iCsboxCap.getGrade();
-        }
-        openSwitch=false;
+        ModCapability.getSeed(this.entity).ifPresent(iCsboxCap -> {
+            ItemStack itemStack = iCsboxCap.getItem();
+            if (!itemStack.isEmpty()) {
+                openItem = itemStack;
+                grade = iCsboxCap.getGrade();
+            }
+            openSwitch = false;
+        });
     }
 
     //@Override

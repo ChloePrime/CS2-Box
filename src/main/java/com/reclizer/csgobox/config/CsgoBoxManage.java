@@ -1,78 +1,47 @@
 package com.reclizer.csgobox.config;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.*;
 import com.reclizer.csgobox.CsgoBox;
 import com.reclizer.csgobox.item.ItemCsgoBox;
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
+import net.minecraftforge.fml.loading.FMLPaths;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
 import java.util.List;
-import java.util.Optional;
+
+import static java.nio.file.StandardOpenOption.*;
 
 public class CsgoBoxManage {
 
     private static final Gson GSON = new Gson();
-    private static final Path CONFIG_DIR = Paths.get("config").resolve("csbox");
-    private static final Path CONFIG_FILE = CONFIG_DIR.resolve("box.json");
+    private static final Path CONFIG_DIR = FMLPaths.CONFIGDIR.relative().resolve("csbox");
 
-    public static List<ItemCsgoBox.BoxInfo> BOX = Lists.newArrayList();
+    public static final List<ItemCsgoBox.BoxInfo> BOX = Lists.newArrayList();
 
     public static void loadConfigBox() throws IOException {
         if (!Files.isDirectory(CONFIG_DIR)) {
             Files.createDirectories(CONFIG_DIR);
         }
 
-        File file = CONFIG_FILE.toFile();
-        InputStream stream = null;
-        if (Files.exists(CONFIG_FILE)) {
-            stream = Files.newInputStream(file.toPath());
-        } else {
-            ResourceLocation res = new ResourceLocation(CsgoBox.MODID, "box.json");
-            Optional<Resource> optional = Minecraft.getInstance().getResourceManager().getResource(res);
-            if (optional.isPresent()) {
-                stream = optional.get().open();
-            }
-        }
-        if (stream != null) {
-            BOX = GSON.fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8),
-                    new TypeToken<List<ItemCsgoBox.BoxInfo>>() {
-                    }.getType());
+        try (var stream = Files.walk(CONFIG_DIR, 1)) {
+            boolean[] init = {false};
+            stream.skip(1).filter(path -> path.getFileName().toString().endsWith(".json")).forEach(boxConfig -> {
+                if (!init[0]) {
+                    init[0] = true;
+                    BOX.clear();
+                }
+                try {
+                    BOX.add(GSON.fromJson(Files.newBufferedReader(boxConfig), ItemCsgoBox.BoxInfo.class));
+                } catch (Exception ex) {
+                    CsgoBox.LOGGER.error("Failed reading %s".formatted(boxConfig.getFileName().toString()), ex);
+                }
+            });
         }
     }
 
-
-    public static void updateBoxJson(String name, List<String> item,List<Integer> grade)throws IOException {
-        // 读取原始的 JSON 数据
-//        File file = CONFIG_FILE.toFile();
-//        InputStream stream = null;
-//        if (Files.exists(CONFIG_FILE)) {
-//            stream = Files.newInputStream(file.toPath());
-//        } else {
-//            ResourceLocation res = new ResourceLocation(CsgoBox.MODID, "box.json");
-//            Optional<Resource> optional = Minecraft.getInstance().getResourceManager().getResource(res);
-//            if (optional.isPresent()) {
-//                stream = optional.get().open();
-//            }
-//        }
-        //JsonArray jsonArray=GSON.fromJso
-
-
-        JsonArray jsonArray = readJsonFile(CONFIG_FILE);
+    public static void updateBoxJson(String name, List<String> item, List<Integer> grade) throws IOException {
         //"random": [2, 5, 6,20, 625],
         // 创建新的 JSON 对象
         JsonObject newObject = new JsonObject();
@@ -80,8 +49,7 @@ public class CsgoBoxManage {
         newObject.addProperty("key", "csgobox:csgo_key0");
         newObject.addProperty("drop", 0);
 
-//        newObject.addProperty("random",0);
-        JsonArray jsonInt=new JsonArray();
+        JsonArray jsonInt = new JsonArray();
         jsonInt.add(2);
         jsonInt.add(5);
         jsonInt.add(6);
@@ -89,18 +57,18 @@ public class CsgoBoxManage {
         jsonInt.add(625);
         newObject.add("random", jsonInt);
 
-        JsonArray jsonArray0=new JsonArray();
+        JsonArray jsonArray0 = new JsonArray();
         jsonArray0.add("minecraft:zombie");
         newObject.add("entity", jsonArray0);
 
-        JsonArray jsonArray1=new JsonArray();
-        JsonArray jsonArray2=new JsonArray();
-        JsonArray jsonArray3=new JsonArray();
-        JsonArray jsonArray4=new JsonArray();
-        JsonArray jsonArray5=new JsonArray();
+        JsonArray jsonArray1 = new JsonArray();
+        JsonArray jsonArray2 = new JsonArray();
+        JsonArray jsonArray3 = new JsonArray();
+        JsonArray jsonArray4 = new JsonArray();
+        JsonArray jsonArray5 = new JsonArray();
 
-        if(item.size()>0){
-            for (int i=0;i<item.size();i++){
+        if (!item.isEmpty()) {
+            for (int i = 0; i < item.size(); i++) {
                 switch (grade.get(i)) {
                     case 1 -> jsonArray1.add(item.get(i));
                     case 2 -> jsonArray2.add(item.get(i));
@@ -112,51 +80,23 @@ public class CsgoBoxManage {
         }
 
 
-
         newObject.add("grade1", jsonArray1);
         newObject.add("grade2", jsonArray2);
         newObject.add("grade3", jsonArray3);
         newObject.add("grade4", jsonArray4);
         newObject.add("grade5", jsonArray5);
 
-        // 将新的对象添加到数组中
-        jsonArray.add(newObject);
 
         // 将更新后的数组写回文件
-        writeJsonFile(CONFIG_FILE, jsonArray);
+        writeJsonFile(CONFIG_DIR.resolve(name + ".json"), newObject);
     }
 
-    private static JsonArray readJsonFile(Path filePath) {
-        try  {
-            // 使用 JsonParser 解析 JSON 文件
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-            return gson.fromJson(Files.newBufferedReader(filePath, StandardCharsets.UTF_8), JsonArray.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return new JsonArray();
-    }
-
-    private static void writeJsonFile(Path filePath, JsonArray jsonArray) {
-        try  {
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String jsonContent = gson.toJson(jsonArray);
-
-            // 使用 Files.writeString 写入文件
-            //Files.writeString(filePath, jsonContent, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
-            Files.writeString(filePath, jsonContent, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING);
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static void writeJsonFile(Path filePath, JsonElement jsonElement) {
+        try {
+            Files.createDirectories(filePath.getParent());
+            Files.writeString(filePath, jsonElement.toString(), StandardCharsets.UTF_8, CREATE, TRUNCATE_EXISTING);
+        } catch (IOException ex) {
+            CsgoBox.LOGGER.error("Failed to save box config", ex);
         }
     }
-
-
-
-
-
-
 }

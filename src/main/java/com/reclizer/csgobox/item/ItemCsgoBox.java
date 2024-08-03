@@ -38,7 +38,7 @@ import java.util.*;
 
 import static net.minecraft.nbt.Tag.TAG_STRING;
 
-public class ItemCsgoBox extends Item{
+public class ItemCsgoBox extends Item {
     public ItemCsgoBox() {
         super(new Properties().stacksTo(16).rarity(Rarity.EPIC));
 
@@ -49,10 +49,6 @@ public class ItemCsgoBox extends Item{
     public boolean canPerformAction(ItemStack stack, net.minecraftforge.common.ToolAction toolAction) {
         return net.minecraftforge.common.ToolActions.DEFAULT_SWORD_ACTIONS.contains(toolAction);
     }
-
-
-
-
 
 
 //    @Override
@@ -90,84 +86,75 @@ public class ItemCsgoBox extends Item{
 //    }
 
 
-
-
-
-
-
-
-
-
-
-    public static int[] getRandom(ItemStack stack){
-        BoxInfo info =getBoxInfo(stack);
-        int [] array={2,5,25,125,625};
-        if(info!=null&&info.boxRandom!=null&&info.boxRandom.length>4) {
-            array=info.boxRandom;
+    public static int[] getRandom(ItemStack stack) {
+        BoxInfo info = getBoxInfo(stack);
+        int[] array = {2, 5, 25, 125, 625};
+        if (info != null && info.boxRandom != null && info.boxRandom.length > 4) {
+            array = info.boxRandom;
         }
         return array;
     }
 
 
-
-    public ListTag getItemName(ItemStack stack){
-        ListTag item=null;
+    public ListTag getItemName(ItemStack stack) {
+        ListTag item = null;
 
         //int value=0;
         try {
-            item =stack.getItem().getShareTag(stack).getList("items_list", TAG_STRING);
-        } catch (Exception exception){}
+            item = stack.getItem().getShareTag(stack).getList("items_list", TAG_STRING);
+        } catch (Exception exception) {
+        }
         return item;
     }
 
-    public int[] getItemGrade(ItemStack stack){
-        int[] value=new int[2];
+    public int[] getItemGrade(ItemStack stack) {
+        int[] value = new int[2];
         //int value=0;
         try {
-            value=stack.getItem().getShareTag(stack).getIntArray("items_grade");
-        } catch (Exception exception){}
+            value = stack.getItem().getShareTag(stack).getIntArray("items_grade");
+        } catch (Exception exception) {
+        }
         return value;
     }
 
 
-    public Map<ItemStack , Integer> getItemGroup(ItemStack stack){
-        Map<ItemStack , Integer> ItemsMap=new LinkedHashMap<>();
+    public Map<ItemStack, Integer> getItemGroup(ItemStack stack) {
+        Map<ItemStack, Integer> ItemsMap = new LinkedHashMap<>();
 
         //ListTag items=getItemName(stack);
         //int [] grade=getItemGrade(stack);
-        BoxInfo info =getBoxInfo(stack);
-        
-        if(info!=null){
-            
-            if(info.grade1!=null&&info.grade1.size()>0){
-                for (int i=0;i<info.grade1.size();i++){
-                    ItemsMap.put(ItemNBT.getStacks(info.grade1.get(i)),1);
-                }  
-            }
-            if(info.grade2!=null&&info.grade2.size()>0){
-                for (int i=0;i<info.grade2.size();i++){
-                    ItemsMap.put(ItemNBT.getStacks(info.grade2.get(i)),2);
+        BoxInfo info = getBoxInfo(stack);
+
+        if (info != null) {
+
+            if (info.grade1 != null && info.grade1.size() > 0) {
+                for (int i = 0; i < info.grade1.size(); i++) {
+                    ItemsMap.put(ItemNBT.getStacks(info.grade1.get(i)), 1);
                 }
             }
-            if(info.grade3!=null&&info.grade3.size()>0){
-                for (int i=0;i<info.grade3.size();i++){
-                    ItemsMap.put(ItemNBT.getStacks(info.grade3.get(i)),3);
+            if (info.grade2 != null && info.grade2.size() > 0) {
+                for (int i = 0; i < info.grade2.size(); i++) {
+                    ItemsMap.put(ItemNBT.getStacks(info.grade2.get(i)), 2);
                 }
             }
-            if(info.grade4!=null&&info.grade4.size()>0){
-                for (int i=0;i<info.grade4.size();i++){
-                    ItemsMap.put(ItemNBT.getStacks(info.grade4.get(i)),4);
+            if (info.grade3 != null && info.grade3.size() > 0) {
+                for (int i = 0; i < info.grade3.size(); i++) {
+                    ItemsMap.put(ItemNBT.getStacks(info.grade3.get(i)), 3);
                 }
             }
-            if(info.grade5!=null&&info.grade5.size()>0){
-                for (int i=0;i<info.grade5.size();i++){
-                    ItemsMap.put(ItemNBT.getStacks(info.grade5.get(i)),5);
+            if (info.grade4 != null && info.grade4.size() > 0) {
+                for (int i = 0; i < info.grade4.size(); i++) {
+                    ItemsMap.put(ItemNBT.getStacks(info.grade4.get(i)), 4);
+                }
+            }
+            if (info.grade5 != null && info.grade5.size() > 0) {
+                for (int i = 0; i < info.grade5.size(); i++) {
+                    ItemsMap.put(ItemNBT.getStacks(info.grade5.get(i)), 5);
                 }
             }
 
-            
+
         }
-        
 
 
         return ItemsMap;
@@ -179,9 +166,9 @@ public class ItemCsgoBox extends Item{
 
     //@Override
 
-    public static String getKey(ItemStack stack){
-        BoxInfo info =getBoxInfo(stack);
-        if(info!=null&&info.boxKey!=null){
+    public static String getKey(ItemStack stack) {
+        BoxInfo info = getBoxInfo(stack);
+        if (info != null && info.boxKey != null) {
             //ResourceLocation res=new ResourceLocation(info.boxKey);
             return info.boxKey;
         }
@@ -191,6 +178,7 @@ public class ItemCsgoBox extends Item{
 //=============================================================================================================================================
 
     public static final String BOX_INFO_TAG = "BoxItemInfo";
+
     public static BoxInfo getBoxInfo(ItemStack stack) {
         if (stack.getItem() == ModItems.ITEM_CSGOBOX.get()) {
             CompoundTag tag = stack.getTag();
@@ -237,45 +225,44 @@ public class ItemCsgoBox extends Item{
     }
 
 
-
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        BoxInfo  info= getBoxInfo(stack);
+        BoxInfo info = getBoxInfo(stack);
         tooltip.add(Component.translatable("tooltips.csgobox.item.cs_box").withStyle(ChatFormatting.GRAY));
         if (info != null) {
-            List<String> item=info.grade1;
-            for (String value:item){
-                ItemStack itemStack=ItemNBT.getStacks(value);
+            List<String> item = info.grade1;
+            for (String value : item) {
+                ItemStack itemStack = ItemNBT.getStacks(value);
 
-                Component component=itemStack.getItem().getName(itemStack);
-                MutableComponent mutableComponent=component.copy();
+                Component component = itemStack.getItem().getName(itemStack);
+                MutableComponent mutableComponent = component.copy();
                 tooltip.add(mutableComponent.withStyle(ChatFormatting.BLUE));
 
             }
-            List<String> item2=info.grade2;
-            for (String value:item2){
-                ItemStack itemStack=ItemNBT.getStacks(value);
+            List<String> item2 = info.grade2;
+            for (String value : item2) {
+                ItemStack itemStack = ItemNBT.getStacks(value);
 
-                Component component=itemStack.getItem().getName(itemStack);
-                MutableComponent mutableComponent=component.copy();
+                Component component = itemStack.getItem().getName(itemStack);
+                MutableComponent mutableComponent = component.copy();
                 tooltip.add(mutableComponent.withStyle(ChatFormatting.DARK_BLUE));
 
             }
-            List<String> item3=info.grade3;
-            for (String value:item3){
-                ItemStack itemStack=ItemNBT.getStacks(value);
+            List<String> item3 = info.grade3;
+            for (String value : item3) {
+                ItemStack itemStack = ItemNBT.getStacks(value);
 
-                Component component=itemStack.getItem().getName(itemStack);
-                MutableComponent mutableComponent=component.copy();
+                Component component = itemStack.getItem().getName(itemStack);
+                MutableComponent mutableComponent = component.copy();
                 tooltip.add(mutableComponent.withStyle(ChatFormatting.DARK_PURPLE));
 
             }
-            List<String> item4=info.grade4;
-            for (String value:item4){
-                ItemStack itemStack=ItemNBT.getStacks(value);
+            List<String> item4 = info.grade4;
+            for (String value : item4) {
+                ItemStack itemStack = ItemNBT.getStacks(value);
 
-                Component component=itemStack.getItem().getName(itemStack);
-                MutableComponent mutableComponent=component.copy();
+                Component component = itemStack.getItem().getName(itemStack);
+                MutableComponent mutableComponent = component.copy();
                 tooltip.add(mutableComponent.withStyle(ChatFormatting.RED));
 
             }
@@ -283,14 +270,8 @@ public class ItemCsgoBox extends Item{
             tooltip.add(Component.translatable("gui.csgobox.csgo_box.label_gold").withStyle(ChatFormatting.YELLOW));
 
 
-
-
-
         }
     }
-
-
-
 
 
     public static class BoxInfo {
@@ -304,7 +285,7 @@ public class ItemCsgoBox extends Item{
         public String boxKey;
 
         @SerializedName("random")
-        public int [] boxRandom ;
+        public int[] boxRandom;
         @SerializedName("grade1")
         public List<String> grade1 = Lists.newArrayList();
         @SerializedName("grade2")
@@ -348,16 +329,16 @@ public class ItemCsgoBox extends Item{
             this.boxName = tag.getString("name");
 
             if (tag.contains("key", TAG_STRING)) {
-                this.boxKey=tag.getString("key");
+                this.boxKey = tag.getString("key");
             }
 
 
             if (tag.contains("drop", Tag.TAG_FLOAT)) {
-                this.dropRandom=tag.getFloat("drop");
+                this.dropRandom = tag.getFloat("drop");
             }
 
             if (tag.contains("random", Tag.TAG_INT_ARRAY)) {
-                this.boxRandom= tag.getIntArray("random");
+                this.boxRandom = tag.getIntArray("random");
 
             }
             if (tag.contains("grade1", Tag.TAG_LIST)) {
@@ -391,10 +372,8 @@ public class ItemCsgoBox extends Item{
                 this.dropEntity = Lists.newArrayList();
                 tagList.forEach(nbt -> this.dropEntity.add(nbt.getAsString()));
             }
-            
-            
-            
-            
+
+
         }
 
         public static BoxInfo deserializeNBT(CompoundTag tag) {
@@ -407,10 +386,10 @@ public class ItemCsgoBox extends Item{
             //System.out.println("================================================================================================================================================================================");
             //tag.accept()
 
-            tag.putString("name",info.boxName);
-            tag.putString("key",info.boxKey);
-            tag.putFloat("drop",info.dropRandom);
-            tag.putIntArray("random",info.boxRandom);
+            tag.putString("name", info.boxName);
+            tag.putString("key", info.boxKey);
+            tag.putFloat("drop", info.dropRandom);
+            tag.putIntArray("random", info.boxRandom);
 
             if (info.grade1 != null && !info.grade1.isEmpty()) {
                 ListTag nbt = new ListTag();
@@ -449,11 +428,5 @@ public class ItemCsgoBox extends Item{
                 tag.put("entity", nbt);
             }
         }
-
-
     }
-
-
-
-
 }

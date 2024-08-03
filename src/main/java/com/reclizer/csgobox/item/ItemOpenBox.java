@@ -22,8 +22,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.network.NetworkHooks;
 
-import static com.reclizer.csgobox.utils.ItemNBT.isModLoaded;
-
 public class ItemOpenBox extends Item {
     public ItemOpenBox() {
         super(new Properties().stacksTo(1).rarity(Rarity.EPIC));
@@ -37,9 +35,6 @@ public class ItemOpenBox extends Item {
         if(world.isClientSide){
             return ar;
         }
-
-
-        //System.out.println(isModLoaded("crafttweaker"));
 
         execute(world, entity.getX(), entity.getY(), entity.getZ(), entity);
 
